@@ -303,7 +303,6 @@ def getTradingRuleFeatures(df, Rule_params):
     output: trading_rule_df, a new dataframe contains the trading rule features only.
     '''
     OHLC = [df.Open, df.High, df.Low, df.Close]
-    print(type(df.Close))
     logr = np.diff(df.Close, prepend=[np.nan])
     # logr = np.log(df.Close / df.Close.shift(1))
 
@@ -312,7 +311,8 @@ def getTradingRuleFeatures(df, Rule_params):
 
     trading_rule_df = pd.DataFrame({'logr': logr})
     for i in range(len(All_Rules)):
-        rule_series = pd.Series(All_Rules[i](Rule_params[i], OHLC)[1], index=trading_rule_df.index)
+        rule_series = pd.Series(All_Rules[i](Rule_params[i], OHLC)[1].values,
+                                index=trading_rule_df.index)
         trading_rule_df['Rule' + str(i + 1)] = rule_series
     trading_rule_df.dropna(inplace=True)
     return trading_rule_df
