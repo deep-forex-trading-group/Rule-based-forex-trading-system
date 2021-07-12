@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from ta import *
+from .ta import *
 
 
 def Rule1(param, OHLC):

@@ -114,6 +114,8 @@ def GA_train(training_df, optimizing_selection=0, sol_per_pop=8, num_parents_mat
     fitness = cal_pop_fitness(equation_inputs, new_population, optimizing_selection)
     # Then return the index of that solution corresponding to the best fitness.
     best_match_idx = np.where(fitness == np.max(fitness))
+    print(best_match_idx)
+    print(best_outputs)
 
     plt.plot(best_outputs)
     plt.xlabel("Iteration")
