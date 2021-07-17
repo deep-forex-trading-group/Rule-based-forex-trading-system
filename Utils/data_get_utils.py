@@ -22,10 +22,10 @@ def calc_profit(rc_df, act_cname="action", open_price_cname="open_price", close_
         np.testing.assert_array_almost_equal(np.array(rc_pips), np.array(rc_df["pips"]), decimal=1, verbose=True)
     rc_profits_calc_itself_col_series = rc_pips*rc_df[lots_cname]*10 + rc_df[comm_cname] + rc_df[swaps_cname]
     if check_output_col:
+        rc_df[output_cname] = rc_profits_calc_itself_col_series
+    if check_output_col:
         np.testing.assert_array_almost_equal(np.array(rc_profits_calc_itself_col_series), np.array(rc_df[output_cname]), 
                               decimal=1, verbose=True)
-    if check_output_col:
-        rc_df[output_cname] = rc_profits_calc_itself_col_series
     return rc_profits_calc_itself_col_series
 
 
