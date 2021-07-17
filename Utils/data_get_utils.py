@@ -5,17 +5,28 @@ from datetime import timedelta
 from datetime import datetime
 from pandas.testing import assert_series_equal
 
+def calc_profit(action, open_price, close_price, lots, comission, swaps, decimal_pips):
+    pips_change = (close_price - open_price) * decimal_pips if action == "buy" \
+              else (open_price - close_price) * decimal_pips
+    profits = pips_change * lots + commision + swaps
+    return profits
 
 def calc_profit(rc_df, act_cname="action", open_price_cname="open_price", close_price_cname="close_price", 
-           lots_cname="lots", comm_cname="commission", swaps_cname="swaps", decimal_pips=10000):
+           lots_cname="lots", comm_cname="commission", swaps_cname="swaps", decimal_pips=10000, 
+           output_cname="profits_calc", 
+           check_pips_eq=True, check_output_col=True):
     rc_pips = np.where(rc_df[act_cname]=='buy', 
                  (rc_df[close_price_cname]-rc_df[open_price_cname]) * decimal_pips, 
                  (rc_df[open_price_cname]-rc_df[close_price_cname]) * decimal_pips)
-    np.testing.assert_array_almost_equal(np.array(rc_pips), np.array(rc_df["pips"]), decimal=1, verbose=True)
-    rc_profits_calc_itself_col_series = ((rc_pips)/decimal_pips)*rc_df[lots_cname]*decimal_pips + rc_df[comm_cname] + rc_df[swaps_cname]
-    np.testing.assert_array_almost_equal(np.array(rc_profits_calc_itself_col_series), np.array(rc_df["profits_calc"]), 
+    if check_pips_eq:
+        np.testing.assert_array_almost_equal(np.array(rc_pips), np.array(rc_df["pips"]), decimal=1, verbose=True)
+    rc_profits_calc_itself_col_series = rc_pips*rc_df[lots_cname]*10 + rc_df[comm_cname] + rc_df[swaps_cname]
+    if check_output_col:
+        np.testing.assert_array_almost_equal(np.array(rc_profits_calc_itself_col_series), np.array(rc_df[output_cname]), 
                               decimal=1, verbose=True)
-    rc_df["profits_calc"] = rc_profits_calc_itself_col_series
+    if check_output_col:
+        rc_df[output_cname] = rc_profits_calc_itself_col_series
+    return rc_profits_calc_itself_col_series
 
 
 def get_duka_data_df(path, symbol):
