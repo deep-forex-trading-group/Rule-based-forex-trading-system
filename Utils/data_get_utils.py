@@ -1,9 +1,16 @@
 import pandas as pd
 import numpy as np
 
+import os
+import sys
+module_path = os.path.abspath(os.path.join('..'))
+if module_path not in sys.path:
+    sys.path.append(module_path)
+
 from datetime import timedelta
 from datetime import datetime
 from pandas.testing import assert_series_equal
+from Config.config import decimal_pips_dict
 
 def calc_profit(action, open_price, close_price, lots, comission, swaps, decimal_pips):
     pips_change = (close_price - open_price) * decimal_pips if action == "buy" \
@@ -15,6 +22,7 @@ def calc_profit(rc_df, act_cname="action", open_price_cname="open_price", close_
            lots_cname="lots", comm_cname="commission", swaps_cname="swaps", decimal_pips=10000, 
            output_cname="profits_calc", 
            check_pips_eq=True, check_output_col=True):
+    decimal_pips = rc_df["symbol"].map(decimal_pips_dict)
     rc_pips = np.where(rc_df[act_cname]=='buy', 
                  (rc_df[close_price_cname]-rc_df[open_price_cname]) * decimal_pips, 
                  (rc_df[open_price_cname]-rc_df[close_price_cname]) * decimal_pips)
@@ -65,9 +73,9 @@ def get_fm_rc_data_df(path, drop_balance_info=True, time_delta_hour=3, decimal_p
                 'profits', 'pips','commission','swaps']
     # filter the meaningless with 0 lots record, weekends and holidays
     rc_df = rc_df[rc_df["lots"] != 0]
-    
+    decimal_pips = rc_df["symbol"].map(decimal_pips_dict)
     # caculate the profit based on the raw price variation data
-    rc_df["profits_calc"] = (rc_df["pips"]/decimal_pips)*rc_df["lots"]*decimal_pips + rc_df["commission"] + rc_df["swaps"]
+    rc_df["profits_calc"] = calc_profit(rc_df)
     
     # calculate the commision counted as the pips change
     rc_df["commission_by_pips"] = rc_df["commission"]/rc_df["lots"]/10
