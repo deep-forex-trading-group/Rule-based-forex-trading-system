@@ -15,4 +15,7 @@ def difference_rate(dataset, interval=1):
         value = (dataset[i] - dataset[i - interval])/dataset[i - interval]
         diff.append(value)
     return Series(diff)
+
+def reverse_df(df):
+    return df.reindex(index=df.index[::-1])
     
