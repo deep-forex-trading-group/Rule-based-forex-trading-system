@@ -51,6 +51,15 @@ def get_duka_data_df(path, symbol):
     df.columns = ["symbol","datetime", "open", "high", "low", "close", "volume"]
     return df
 
+def get_duka_data_df_by_list(bar_data_path_list, symbol):
+    data_read_df_list = []
+    for input_bar_data_path in bar_data_path_list:
+        duka_df = get_duka_data_df(input_bar_data_path, symbol)
+        data_read_df_list.append(duka_df)
+    res_df = pd.concat(data_read_df_list)
+    data_read_df_list.clear()
+    return res_df
+
 def get_fm_rc_data_df(path, drop_balance_info=True, time_delta_hour=3, decimal_pips=10000):
     """
      get the followme records data
